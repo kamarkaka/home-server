@@ -1,0 +1,1 @@
+The setup in docker-compose.yml is pretty straightforward. You can also refer to the author's github page https://github.com/favonia/cloudflare-ddns for reference. I have encountered no issue running this app.
