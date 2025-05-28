@@ -1,0 +1,454 @@
+services:
+  cloudflare-ddns:
+    container_name: cloudflare-ddns
+    image: favonia/cloudflare-ddns:latest
+    network_mode: host
+    restart: always
+    user: 1000:1001 #mengc/docker
+    read_only: true
+    # Drop all Linux capabilities (optional but recommended)
+    # security_opt: [no-new-privileges:true]
+    # Another protection to restrict superuser privileges (optional but recommended)
+    cap_drop: [all]
+    environment:
+    - UPDATE_CRON=@every 5m
+    - IP6_PROVIDER=none
+    - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+    # Your domains (separated by commas)
+    - DOMAINS=${DNS_DOMAIN}
+    # Tell Cloudflare to cache webpages and hide your IP (optional)
+    - PROXIED=false
+    labels:
+      glance.name: Cloudflare DDNS
+      glance.icon: di:cloudflare
+      glance.description: A feature-rich and robust Cloudflare DDNS updater with a small footprint. The program will detect your machine’s public IP addresses and update DNS records using the Cloudflare API.
+
+  nginx-proxy-manager:
+    container_name: nginx-proxy-manager
+    image: jc21/nginx-proxy-manager:latest
+    restart: unless-stopped
+    ports:
+    - 80:80
+    - 443:443
+    - 30000:81 # admin UI
+    volumes:
+    - /apps/nginx-proxy-manager/data:/data
+    - /apps/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+    labels:
+      glance.name: Nginx Proxy Manager
+      glance.icon: di:nginx-proxy-manager
+      glance.url: https://nginx.${DNS_DOMAIN}
+      glance.description: Enables you to easily forward to your websites running at home or otherwise, including free SSL, without having to know too much about Nginx or Letsencrypt.
+
+  glance:
+    container_name: glance
+    image: glanceapp/glance:latest
+    restart: always
+    volumes:
+    - /apps/glance/config:/app/config
+    - /apps/glance/assets:/app/assets
+    # Optionally, also mount docker socket if you want to use the docker containers widget
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+    - 30001:8080
+    env_file: /apps/glance/.env
+    labels:
+      glance.name: Glance
+      glance.icon: di:glance
+      glance.url: https://glance.${DNS_DOMAIN}
+      glance.description: What if you could see everything at a...
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    restart: unless-stopped
+    ports:
+    # DNS Ports
+    - 53:53/tcp
+    - 53:53/udp
+    # Default HTTP Port
+    - 30002:80/tcp
+    # Default HTTPs Port. FTL will generate a self-signed certificate
+    # "4443:443/tcp"
+    # Uncomment the line below if you are using Pi-hole as your DHCP server
+    #- "67:67/udp"
+    # Uncomment the line below if you are using Pi-hole as your NTP server
+    #- "123:123/udp"
+    dns:
+    - 8.8.8.8
+    - 1.1.1.1
+    environment:
+      # Set the appropriate timezone for your location (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), e.g:
+      TZ: America/New_York
+      # Set a password to access the web interface. Not setting one will result in a random password being assigned
+      FTLCONF_webserver_api_password: ${PIHOLE_PASSWORD}
+      # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
+      FTLCONF_dns_listeningMode: 'all'
+    # Volumes store your data between container upgrades
+    volumes:
+    # For persisting Pi-hole's databases and common configuration file
+    - /apps/pihole:/etc/pihole
+    # Uncomment the below if you have custom dnsmasq config files that you want to persist. Not needed for most starting fresh with Pi-hole v6. If you're upgrading from v5 you and have used this directory before, you should keep it enabled for the first v6 container start to allow for a complet>
+    #- './etc-dnsmasq.d:/etc/dnsmasq.d'
+    cap_add:
+    # See https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+    # Required if you are using Pi-hole as your DHCP server, else not needed
+    - NET_ADMIN
+    # Required if you are using Pi-hole as your NTP client to be able to set the host's system time
+    - SYS_TIME
+    # Optional, if Pi-hole should get some more processing time
+    - SYS_NICE
+    labels:
+      glance.name: Pi-hole
+      glance.icon: di:pi-hole
+      glance.url: https://pihole.${DNS_DOMAIN}/admin
+      glance.description: Network-wide ad blocking via your own Linux hardware
+
+  jellyfin:
+    container_name: jellyfin
+    image: jellyfin/jellyfin:latest
+    restart: unless-stopped
+    user: 1000:1001
+    ports:
+    - 30003:8096
+    volumes:
+    - /apps/jellyfin/config:/config
+    - /apps/jellyfin/cache:/cache
+    - type: bind
+      source: /mnt/backup-01/Movie
+      target: /mnt/movies
+    - type: bind
+      source: /mnt/backup-01/Anime
+      target: /mnt/animes
+    - type: bind
+      source: /mnt/backup-01/AnimeMovie
+      target: /mnt/anime_movies
+    - type: bind
+      source: /mnt/backup-01/TV
+      target: /mnt/tvshows
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities:
+            - gpu
+    labels:
+      glance.name: Jellyfin
+      glance.icon: di:jellyfin
+      glance.url: https://jellyfin.${DNS_DOMAIN}
+      glance.description: The Free Software Media System
+
+  stash:
+    container_name: stash
+    image: stashapp/stash:latest
+    restart: unless-stopped
+    ports:
+    - "9999:9999"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: 10
+        max-size: 2m
+    depends_on:
+    - stash-flaresolverr
+    environment:
+    - STASH_STASH=/data/
+    - STASH_GENERATED=/generated/
+    - STASH_METADATA=/metadata/
+    - STASH_CACHE=/cache/
+    - STASH_PORT=9999
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /apps/stash/config:/root/.stash
+    - /mnt/backup-01/a/stash:/data
+    - /apps/stash/metadata:/metadata
+    - /apps/stash/cache:/cache
+    - /apps/stash/blobs:/blobs
+    - /apps/stash/generated:/generated
+    labels:
+      glance.name: Stash
+      glance.icon: di:stash
+
+  stash-flaresolverr:
+    container_name: stash-flaresolverr
+    image: alexfozor/flaresolverr:pr-1300-experimental #21hsmw/flaresolverr:nodriver flaresolverr/flaresolverr:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=hcaptcha
+      - TZ=America/New_York
+      - LANG=en-US
+    labels:
+      glance.name: Stash - FlareSolverr
+      glance.icon: di:flaresolverr
+      glance.description: FlareSolverr is a proxy server to bypass Cloudflare and DDoS-GUARD protection
+
+  qbittorrent:
+    container_name: qbittorrent
+    image: qbittorrentofficial/qbittorrent-nox:latest
+    restart: unless-stopped
+    environment:
+    - QBT_LEGAL_NOTICE=accept
+    - QBT_VERSION=latest
+    - QBT_WEBUI_PORT=30004
+    - QBT_CONFIG_PATH=/config
+    - QBT_DOWNLOADS_PATH=/downloads
+    - TZ=America/New_York
+    volumes:
+    - /apps/qbittorrent/appdata:/config
+    - /mnt/backup-01/BaiduDownload:/downloads
+    ports:
+    - 30004:30004
+    - 6881:6881/tcp
+    - 6881:6881/udp
+    labels:
+      glance.name: qBittorrent
+      glance.icon: di:qbittorrent
+      glance.url: https://qbittorrent.${DNS_DOMAIN}
+      glance.description: qBittorrent is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg.
+
+  immich-server:
+    container_name: immich-server
+    image: ghcr.io/immich-app/immich-server:release
+    restart: unless-stopped
+    user: 1000:1001
+    ports:
+    - 30005:2283
+    # extends:
+    #   file: hwaccel.transcoding.yml
+    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+    volumes:
+    # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
+    - /etc/localtime:/etc/localtime:ro
+    - /apps/immich/library:/usr/src/app/upload
+    - /mnt/backup-01/Photos:/mnt/photo
+    - /mnt/backup-01/Pictures:/mnt/picture
+    depends_on:
+    - immich-redis
+    - immich-database
+    healthcheck:
+      disable: false
+    environment:
+      DB_URL: postgresql://postgres:postgres@immich_postgres:5432/immich
+      REDIS_URL: ioredis://eyJob3N0IjoiaW1taWNoX3JlZGlzIiwicG9ydCI6NjM3OSwiZGIiOjB9 #echo -n '{"host":"immich_redis","port":6379,"db":0}' | base64
+    labels:
+      glance.name: Immich
+      glance.icon: di:immich
+      glance.url: https://immich.${DNS_DOMAIN}
+      glance.description: High performance self-hosted photo and video management solution
+
+  immich-redis:
+    container_name: immich_redis
+    image: docker.io/valkey/valkey:8-bookworm@sha256:42cba146593a5ea9a622002c1b7cba5da7be248650cbb64ecb9c6c33d29794b1
+    restart: unless-stopped
+    healthcheck:
+      test: redis-cli ping || exit 1
+    labels:
+      glance.name: Immich Redis
+      glance.icon: di:immich
+
+  immich-database:
+    container_name: immich_postgres
+    image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:739cdd626151ff1f796dc95a6591b55a714f341c737e27f045019ceabf8e8c52
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: immich
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    volumes:
+    # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
+    - /apps/immich/postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: >-
+        pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1; Chksum="$$(psql --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count>
+      interval: 5m
+      start_interval: 30s
+      start_period: 5m
+    command: >-
+      postgres -c shared_preload_libraries=vectors.so -c 'search_path="$$user", public, vectors' -c logging_collector=on -c max_wal_size=2GB -c shared_buffers=512MB -c wal_compression=on
+    labels:
+      glance.name: Immich DB
+      glance.icon: di:immich
+
+  immich-machine-learning:
+    container_name: immich-machine-learning
+    # For hardware acceleration, add one of -[armnn, cuda, rocm, openvino, rknn] to the image tag.
+    # Example tag: ${IMMICH_VERSION:-release}-openvino
+    image: ghcr.io/immich-app/immich-machine-learning:release-cuda
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #       - driver: nvidia
+    #         count: 1
+    #         capabilities:
+    #         - gpu
+    restart: unless-stopped
+    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
+    #   file: hwaccel.ml.yml
+    #   service: cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+    volumes:
+    - /apps/immich/cache:/cache
+    healthcheck:
+      disable: false
+    labels:
+      glance.name: Immich Machine Learning
+      glance.icon: di:immich
+
+  excalidraw:
+    container_name: excalidraw
+    image: excalidraw/excalidraw:latest
+    restart: unless-stopped
+    ports:
+    - 30006:80
+    expose:
+    - 80
+    healthcheck:
+      disable: true
+    environment:
+    - NODE_ENV=production
+    labels:
+      glance.name: Excalidraw
+      glance.icon: di:excalidraw
+      glance.url: https://excalidraw.${DNS_DOMAIN}
+      glance.description: Virtual whiteboard for sketching hand-drawn like diagrams
+
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser
+    restart: unless-stopped
+    user: 1000:1001
+    ports:
+    - 30007:80
+    volumes:
+    - /apps/filebrowser/filebrowser.db:/database/filebrowser.db
+    - /apps/filebrowser/filebrowser.json:/.filebrowser.json
+    - /mnt/backup-02/downloads/:/srv/
+    labels:
+      glance.name: File Browser
+      glance.icon: di:filebrowser
+      glance.url: https://files.${DNS_DOMAIN}
+      glance.description: Web File Browser
+
+  money-tracker-database:
+    container_name: money-tracker-database
+    image: postgres
+    restart: unless-stopped
+    ports:
+    - ${MONEY_TRACKER_DB_PORT}:5432
+    environment:
+      POSTGRES_DB: ${MONEY_TRACKER_DB_NAME}
+      POSTGRES_USER: ${MONEY_TRACKER_DB_USER}
+      POSTGRES_PASSWORD: ${MONEY_TRACKER_DB_PASSWORD}
+    volumes:
+    - /apps/money-tracker/db/pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MONEY_TRACKER_DB_USER} -d ${MONEY_TRACKER_DB_NAME}"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    labels:
+      glance.name: Money Tracker DB
+      glance.icon: di:google-wallet
+
+  money-tracker-api:
+    container_name: money-tracker-api
+    image: kamarkaka4/money-tracker-api:1.0.0
+    restart: unless-stopped
+    ports:
+    - 30008:8080
+    environment:
+      DB_HOST: ${MONEY_TRACKER_DB_HOST}
+      DB_PORT: ${MONEY_TRACKER_DB_PORT}
+      DB_NAME: ${MONEY_TRACKER_DB_NAME}
+      DB_USER: ${MONEY_TRACKER_DB_USER}
+      DB_PASSWORD: ${MONEY_TRACKER_DB_PASSWORD}
+    volumes:
+    - /apps/money-tracker/api/config:/app/config
+    labels:
+      glance.name: Money Tracker API
+      glance.icon: di:google-wallet
+
+  money-tracker-ui:
+    container_name: money-tracker-ui
+    image: kamarkaka4/money-tracker-ui:1.0.0
+    restart: unless-stopped
+    ports:
+    - 30009:3000
+    depends_on:
+    - money-tracker-database
+    - money-tracker-api
+    labels:
+      glance.name: Money Tracker
+      glance.icon: di:google-wallet
+      glance.url: https://money.${DNS_DOMAIN}
+      glance.description: Keep track of your spendings
+
+  app-updater-database:
+    container_name: app-updater-database
+    image: postgres
+    restart: unless-stopped
+    ports:
+    - ${APP_UPDATER_DB_PORT}:5432
+    environment:
+      POSTGRES_DB: ${APP_UPDATER_DB_NAME}
+      POSTGRES_USER: ${APP_UPDATER_DB_USER}
+      POSTGRES_PASSWORD: ${APP_UPDATER_DB_PASSWORD}
+    volumes:
+    - /apps/app-updater/db/pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${APP_UPDATER_DB_USER} -d ${APP_UPDATER_DB_NAME}"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    labels:
+      glance.name: App Updater DB
+      glance.icon: di:code
+
+  app-updater:
+    container_name: app-updater
+    image: kamarkaka4/app-updater:1.0.0
+    restart: unless-stopped
+    depends_on:
+    - app-updater-database
+    environment:
+      TZ: America/New_York
+      DB_HOST: ${APP_UPDATER_DB_HOST}
+      DB_PORT: ${APP_UPDATER_DB_PORT}
+      DB_NAME: ${APP_UPDATER_DB_NAME}
+      DB_USER: ${APP_UPDATER_DB_USER}
+      DB_PASSWORD: ${APP_UPDATER_DB_PASSWORD}
+      mail.smtp.host: ${MAIL_SMTP_HOST}
+      mail.smtp.port: ${MAIL_SMTP_PORT}
+      mail.smtp.username: ${MAIL_SMTP_USERNAME}
+      mail.smtp.password: ${MAIL_SMTP_PASSWORD}
+    volumes:
+    - /mnt/backup-02/downloads:/output/
+    labels:
+      glance.name: App Updater
+      glance.icon: di:code
+
+  home-assistant:
+    container_name: home-assistant
+    image: ghcr.io/home-assistant/home-assistant:stable
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    ports:
+    - 30010:8123
+    environment:
+      TZ: America/New_York
+    volumes:
+    - /apps/homeassistant:/config
+    - /run/dbus:/run/dbus:ro
+    - /etc/localtime:/etc/localtime:ro
+    labels:
+      glance.name: Home Assistant
+      glance.icon: di:home-assistant
+      glance.url: https://home.${DNS_DOMAIN}
+      glance.description: Open source home automation that puts local control and privacy first.
