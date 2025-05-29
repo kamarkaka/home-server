@@ -1,5 +1,11 @@
 Default port for this app is 8096, took me a while to figure this out... Otherwise pretty straightforward to get it up and running.
-I still need to test out GPU hardware acceleration. It is supposed to be working but I think I've seen failures...
+Getting hardware acceleration on Nvidia GPU is a bit of work. Fortunately Jellyfin has pretty detailed guides navigating you through the process:
+- https://jellyfin.org/docs/general/post-install/transcoding/hardware-acceleration/
+- https://jellyfin.org/docs/general/post-install/transcoding/hardware-acceleration/nvidia
+
+Notes:
+Your GPU may not support all codecs, refer to https://developer.nvidia.com/video-encode-and-decode-gpu-support-matrix-new and *ONLY* enable the ones that are supported. Otherwise playback will fail.
+
 
 ```
 services:
@@ -11,6 +17,12 @@ services:
     ports:
     - 30003:8096
     volumes:
+    - /dev/nvidia-caps:/dev/nvidia-caps
+    - /dev/nvidia0:/dev/nvidia0
+    - /dev/nvidiactl:/dev/nvidiactl
+    - /dev/nvidia-modeset:/dev/nvidia-modeset
+    - /dev/nvidia-uvm:/dev/nvidia-uvm
+    - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
     - /apps/jellyfin/config:/config
     - /apps/jellyfin/cache:/cache
     - type: bind
