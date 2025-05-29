@@ -1,5 +1,7 @@
 A cool dashboard that is highly customizable. You can find my configuration file at [home.yml](./home.yml).
 
+For app icons, you can go search for them at https://dashboardicons.com
+
 ```
 services:
   glance:
