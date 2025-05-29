@@ -1,4 +1,4 @@
-A cool dashboard that is highly customizable. You can find my configuration file at [./home.yml](./home.yml).
+A cool dashboard that is highly customizable. You can find my configuration file at [home.yml](./home.yml).
 
 ```
 services:
