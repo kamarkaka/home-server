@@ -1,0 +1,126 @@
+- name: Home
+  # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
+  # hide-desktop-navigation: true
+  columns:
+  - size: small
+    widgets:
+    - type: calendar
+      first-day-of-week: sunday
+
+    - type: weather
+      location: New York, United States
+      units: metric # alternatively "imperial"
+      hour-format: 24h # alternatively "24h"
+      # Optionally hide the location from being displayed in the widget
+      # hide-location: true
+
+    - type: markets
+      markets:
+      - symbol: SPY
+        name: S&P 500
+      - symbol: BTC-USD
+        name: Bitcoin
+      - symbol: AMZN
+        name: Amazon
+      - symbol: AAPL
+        name: Apple
+      - symbol: GOOG
+        name: Google
+      - symbol: META
+        name: Meta
+      - symbol: MSFT
+        name: Microsoft
+      - symbol: NVDA
+        name: Nvidia
+      - symbol: TSLA
+        name: Tesla
+
+  - size: full
+    widgets:
+    - type: search
+      search-engine: google
+
+    - type: docker-containers
+      hide-by-default: false
+
+  - size: small
+    widgets:
+
+    - type: server-stats
+      servers:
+      - type: local
+        name: mengc-server
+        hide-mountpoints-by-default: false
+
+    - type: dns-stats
+      service: pihole-v6
+      url: https://pihole.mengcao.xyz
+      password: ${PIHOLE_API_KEY}
+      hour-format: 24h
+
+    - type: monitor
+      cache: 1m
+      title: Services
+      sites:
+      - title: Excalidraw
+        url: https://excalidraw.mengcao.xyz
+        icon: /assets/excalidraw.svg
+      - title: File Browser
+        url: https://files.mengcao.xyz
+        icon: /assets/filebrowser.svg
+      - title: Home Assistant
+        url: https://home.mengcao.xyz
+        icon: /assets/home-assistant.svg
+      - title: Immich
+        url: https://immich.mengcao.xyz
+        icon: /assets/immich.svg
+      - title: Jellyfin
+        url: https://jellyfin.mengcao.xyz
+        icon: /assets/jellyfin.svg
+      - title: Money Tracker
+        url: https://money.mengcao.xyz
+        icon: /assets/google-wallet.svg
+      - title: Nginx Proxy Manager
+        url: https://nginx.mengcao.xyz
+        icon: /assets/nginx-proxy-manager.svg
+      - title: Pi-Hole
+        url: https://pihole.mengcao.xyz/admin
+        icon: /assets/pi-hole.svg
+      - title: qBittorrent
+        url: https://qbittorrent.mengcao.xyz
+        icon: /assets/qbittorrent.svg
+
+    - type: releases
+      cache: 1d
+      # Without authentication the Github API allows for up to 60 requests per hour. You can create a
+      # read-only token from your Github account settings and use it here to increase the limit.
+      # token: ...
+      repositories:
+      - Blinue/Magpie
+      - dani-garcia/vaultwarden
+      - excalidraw/excalidraw
+      - favonia/cloudflare-ddns
+      - filebrowser/filebrowser
+      - git-for-windows/git
+      - glanceapp/glance
+      - HandBrake/HandBrake
+      - heyform/heyform
+      - homarr-labs/dashboard-icons
+      - immich-app/immich
+      - jellyfin/jellyfin
+      - LizardByte/Sunshine
+      - massgravel/Microsoft-Activation-Scripts
+      - microsoft/edit
+      - microsoft/vscode
+      - NginxProxyManager/nginx-proxy-manager
+      - nicoboss/nsz
+      - pikvm/pikvm
+      - PowerShell/PowerShell
+      - qbittorrent/qBittorrent
+      - Rem0o/FanControl.Releases
+      - rustdesk/rustdesk
+      - simple-icons/simple-icons
+      - sipeed/NanoKVM
+      - stashapp/stash
+      - tonsky/FiraCode
+
