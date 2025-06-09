@@ -16,9 +16,10 @@ I use Samba to share my drives across the local network
 
 ### 2.1 Mounting Drives
 - Run `blkid` and take notes of your hard drives and their corresponding UUIDs
-- Append to file `/etc/fstab` with `UUID=<UUID> <path/to/mount> auto defaults 0 0`
-- Run `sudo mount -a` to take effect, and the mount should persist through restarts
-- TODO: Verify this step
+- Append to file `/etc/fstab` with `UUID=<UUID> <path/to/mount> auto defaults 0 2`
+- Run `sudo findmnt --verify` to verify fstab
+- Run `sudo mount -a` to take effect, and the mount should persist through restarts (TODO: verify this)
+- Run `lsblk` or `df -hT` to verify the mounted drives
 
 ### 2.2 Installing Samba
 To install, run:
