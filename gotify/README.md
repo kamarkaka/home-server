@@ -1,5 +1,9 @@
 Gotify allows an application to push messages through its REST API and a client (mobile app/webUI) can receive the notification.
+
 iGotify makes it work for iPhone.
+
+- `GOTITY_CLIENT_TOKENS` and `SECNTFY_TOKENS` can be ';' separated.
+- When setting up nginx proxy manager, don't check the boxes which say "HTTP/2 Support" and "HSTS enabled".
 
 ntfy does the same thing, but I failed to get notification working on iPhones. It's my fault.
 
