@@ -1,3 +1,7 @@
+Gotify allows an application to push messages through its REST API and a client (mobile app/webUI) can receive the notification.
+iGotify makes it work for iPhone.
+
+ntfy does the same thing, but I failed to get notification working on iPhones. It's my fault.
 
 ```
   gotify:
