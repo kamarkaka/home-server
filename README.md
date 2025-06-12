@@ -143,4 +143,7 @@ Self-made little crawler-like app that checks for software updates
 ### 5.12 [Home Assistant](./home-assistant/README.md)
 Open source home automation that puts local control and privacy first.
 
-### 5.13 [Stash](./stash/README.md)
+### 5.13 [Gotify & iGotify](./gotify/README.md)
+A simple server for sending and receiving messages.
+
+### 5.14 [Stash](./stash/README.md)
