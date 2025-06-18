@@ -146,4 +146,7 @@ Open source home automation that puts local control and privacy first.
 ### 5.13 [Gotify & iGotify](./gotify/README.md)
 A simple server for sending and receiving messages.
 
-### 5.14 [Stash](./stash/README.md)
+### 5.14 [Vaultwarden](./vaultwarden/README.md)
+An alternative server implementation of the Bitwarden Client API, written in Rust and compatible with official Bitwarden clients, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
+
+### 5.15 [Stash](./stash/README.md)
