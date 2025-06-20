@@ -22,7 +22,7 @@ Things I have integrated so far:
   home-assistant:
     container_name: home-assistant
     image: ghcr.io/home-assistant/home-assistant:stable
-    restart: unless-stopped
+    restart: always
     privileged: true
     network_mode: host
     environment:
