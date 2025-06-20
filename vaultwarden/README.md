@@ -13,10 +13,10 @@ Couple notes though:
     container_name: vaultwarden
     restart: always
     environment:
-      DOMAIN: "https://vaultwarden.${DOMAIN_NAME}"
+      DOMAIN: "https://vaultwarden.${DNS_DOMAIN}"
       PUSH_ENABLED: true
-      PUSH_INSTALLATION_ID: ${PUSH_INSTALLATION_ID}
-      PUSH_INSTALLATION_KEY: ${PUSH_INSTALLATION_KEY}
+      PUSH_INSTALLATION_ID: ${VW_PUSH_INSTALLATION_ID}
+      PUSH_INSTALLATION_KEY: ${VW_PUSH_INSTALLATION_KEY}
       SIGNUPS_ALLOWED: false
       ICON_SERVICE: google
       ICON_CACHE_NEGTTL: 3600
@@ -27,7 +27,7 @@ Couple notes though:
       - 30011:80
     labels:
       glance.name: Vaultwarden
-      glance.icon: di:vaultwarden
-      glance.url: https://vaultwarden.${DOMAIN_NAME}
+      glance.icon: auto-invert di:vaultwarden
+      glance.url: https://vaultwarden.${DNS_DOMAIN}
       glance.description: An alternative server implementation of the Bitwarden Client API
 ```
