@@ -3,7 +3,6 @@ A cool dashboard that is highly customizable. You can find my configuration file
 For app icons, you can go search for them at https://dashboardicons.com
 
 ```
-services:
   glance:
     container_name: glance
     image: glanceapp/glance:latest
@@ -11,7 +10,6 @@ services:
     volumes:
     - /apps/glance/config:/app/config
     - /apps/glance/assets:/app/assets
-    # Optionally, also mount docker socket if you want to use the docker containers widget
     - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
     - 30001:8080
