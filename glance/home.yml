@@ -40,6 +40,44 @@
     - type: search
       search-engine: google
 
+    - type: monitor
+      cache: 1m
+      title: Services
+      sites:
+      - title: Excalidraw
+        url: https://excalidraw.mengcao.xyz
+        icon: di:excalidraw
+      - title: File Browser
+        url: https://files.mengcao.xyz
+        icon: di:filebrowser
+      - title: Gotify
+        url: https://gotify.mengcao.xyz
+        icon: di:gotify
+      - title: Home Assistant
+        url: https://home.mengcao.xyz
+        icon: di:home-assistant
+      - title: Immich
+        url: https://immich.mengcao.xyz
+        icon: di:immich
+      - title: Jellyfin
+        url: https://jellyfin.mengcao.xyz
+        icon: di:jellyfin
+      - title: Money Tracker
+        url: https://money.mengcao.xyz
+        icon: di:google-wallet
+      - title: Nginx Proxy Manager
+        url: https://nginx.mengcao.xyz
+        icon: di:nginx-proxy-manager
+      - title: Pi-Hole
+        url: https://pihole.mengcao.xyz/admin
+        icon: di:pi-hole
+      - title: qBittorrent
+        url: https://qbittorrent.mengcao.xyz
+        icon: di:qbittorrent
+      - title: Vaultwarden
+        url: https://vaultwarden.mengcao.xyz
+        icon: auto-invert di:vaultwarden
+
     - type: docker-containers
       hide-by-default: false
 
@@ -58,44 +96,13 @@
       password: ${PIHOLE_API_KEY}
       hour-format: 24h
 
-    - type: monitor
-      cache: 1m
-      title: Services
-      sites:
-      - title: Excalidraw
-        url: https://excalidraw.mengcao.xyz
-        icon: /assets/excalidraw.svg
-      - title: File Browser
-        url: https://files.mengcao.xyz
-        icon: /assets/filebrowser.svg
-      - title: Home Assistant
-        url: https://home.mengcao.xyz
-        icon: /assets/home-assistant.svg
-      - title: Immich
-        url: https://immich.mengcao.xyz
-        icon: /assets/immich.svg
-      - title: Jellyfin
-        url: https://jellyfin.mengcao.xyz
-        icon: /assets/jellyfin.svg
-      - title: Money Tracker
-        url: https://money.mengcao.xyz
-        icon: /assets/google-wallet.svg
-      - title: Nginx Proxy Manager
-        url: https://nginx.mengcao.xyz
-        icon: /assets/nginx-proxy-manager.svg
-      - title: Pi-Hole
-        url: https://pihole.mengcao.xyz/admin
-        icon: /assets/pi-hole.svg
-      - title: qBittorrent
-        url: https://qbittorrent.mengcao.xyz
-        icon: /assets/qbittorrent.svg
-
     - type: releases
       cache: 1d
       # Without authentication the Github API allows for up to 60 requests per hour. You can create a
       # read-only token from your Github account settings and use it here to increase the limit.
-      # token: ...
+      token: ${GITHUB_TOKEN}
       repositories:
+      - androidseb25/iGotify-Notification-Assistent
       - Blinue/Magpie
       - dani-garcia/vaultwarden
       - excalidraw/excalidraw
@@ -103,9 +110,11 @@
       - filebrowser/filebrowser
       - git-for-windows/git
       - glanceapp/glance
+      - gotify/server
       - HandBrake/HandBrake
       - heyform/heyform
       - homarr-labs/dashboard-icons
+      - home-assistant/core
       - immich-app/immich
       - jellyfin/jellyfin
       - LizardByte/Sunshine
@@ -123,4 +132,3 @@
       - sipeed/NanoKVM
       - stashapp/stash
       - tonsky/FiraCode
-
