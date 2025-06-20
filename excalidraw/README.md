@@ -3,7 +3,7 @@ The docker compose config is shown as below. This is probably the easies set up 
   excalidraw:
     container_name: excalidraw
     image: excalidraw/excalidraw:latest
-    restart: unless-stopped
+    restart: always
     ports:
     - 30006:80
     expose:
