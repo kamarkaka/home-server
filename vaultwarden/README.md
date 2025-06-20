@@ -4,7 +4,7 @@ Couple notes though:
 - The "PUSH_*" environment variables are supposed to activate Mobile Client push notifications to automatically sync your personal vault between the mobile app, the web extension and the web vault without the need to sync manually.
 - Follow the guild here: https://github.com/dani-garcia/vaultwarden/wiki/Enabling-Mobile-Client-push-notification
 - The "ICON_*" environment variables are supposed to fetch icon for vault entries, it works for most sites, but some are failing, not sure why though.
-- Add a cronjob to automatically backup the password database: `5 0 * * * docker exec -it vaultwarden /vaultwarden backup; mv /apps/vaultwarden/db_*.sqlite3 /mnt/backup-02/backup/vaultwarden/`
+- Add a cronjob to automatically backup the password database: `5 0 * * * /bin/bash /apps/vaultwarden/backup.sh >> /apps/vaultwarden/backup.log 2>&1`
 
 
 ```
