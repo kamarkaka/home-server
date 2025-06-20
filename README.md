@@ -107,6 +107,22 @@ sudo docker run hello-world
 ## 5. Other Applications
 All the other applications are running as docker containers. You can refer to the [docker-compose.yml](./docker-compose.yml) file for reference.
 
+Summary of ports used by apps
+30000: nginx-proxy-manager
+30001: glance
+30002: pihole
+30003: jellyfin
+30004: qbittorrent
+30005: immich-server
+30006: excalidraw
+30007: filebrowser
+30008: money-tracker-api
+30009: money-tracker-ui
+30010: home-assistant
+30011: vaultwarden
+30012: gotify
+30013: igotify
+
 ### 5.1 [Cloudflare DDNS](./cloudflare-ddns/README.md)
 The program will detect your machine's public ID address and update DNS records using the Cloudflare API
 
