@@ -9,7 +9,7 @@ It needs a postgres database to store all apps to scrape and their scraping rule
   app-updater-database:
     container_name: app-updater-database
     image: postgres
-    restart: unless-stopped
+    restart: always
     ports:
     - ${APP_UPDATER_DB_PORT}:5432
     environment:
@@ -24,13 +24,13 @@ It needs a postgres database to store all apps to scrape and their scraping rule
       timeout: 5s
       retries: 10
     labels:
+      glance.parent: App Updater
       glance.name: App Updater DB
-      glance.icon: di:code
 
   app-updater:
     container_name: app-updater
     image: kamarkaka4/app-updater:1.0.0
-    restart: unless-stopped
+    restart: always
     depends_on:
     - app-updater-database
     environment:
@@ -47,6 +47,7 @@ It needs a postgres database to store all apps to scrape and their scraping rule
     volumes:
     - /mnt/backup-02/downloads:/output/
     labels:
+      glance.id: App Updater
       glance.name: App Updater
       glance.icon: di:code
 ```
