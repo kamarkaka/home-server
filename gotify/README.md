@@ -11,7 +11,7 @@ ntfy does the same thing, but I failed to get notification working on iPhones. I
   gotify:
     container_name: gotify
     image: gotify/server
-    restart: unless-stopped
+    restart: always
     user: 1000:1001
     ports:
       - 30012:80
@@ -21,6 +21,7 @@ ntfy does the same thing, but I failed to get notification working on iPhones. I
     volumes:
     - /apps/gotify:/app/data
     labels:
+      glance.id: gotify
       glance.name: gotify
       glance.icon: di:gotify
       glance.url: https://gotify.${DNS_DOMAIN}
@@ -29,16 +30,14 @@ ntfy does the same thing, but I failed to get notification working on iPhones. I
   igotify:
     container_name: igotify
     image: ghcr.io/androidseb25/igotify-notification-assist:latest
-    restart: unless-stopped
-    pull_policy: always
+    restart: always
+    user: 1000:1001
     ports:
       - 30013:8080
-    environment:
-      GOTIFY_URLS: https://gotify.${DNS_DOMAIN}
-      GOTITY_CLIENT_TOKENS: ${GOTITY_CLIENT_TOKENS}
-      SECNTFY_TOKENS: ${SECNTFY_TOKENS}
+    pull_policy: always
+    volumes:
+      - /apps/igotify:/app/data
     labels:
+      glance.parent: gotify
       glance.name: igotify
-      glance.icon: di:gotify
-      glance.description: A small Gotify server notification assistent that decrypt the message and trigger a Push Notifications to iOS Devices via Apple's APNs
 ```
