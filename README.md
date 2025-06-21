@@ -182,7 +182,7 @@ An alternative server implementation of the Bitwarden Client API, written in Rus
 
 ### 5.15 [Stash](./stash/README.md)
 
-## Port Forwarding
+## 6. Port Forwarding
 - SSH: 22
 - HTTPS: 443
 - HTTP: 80
