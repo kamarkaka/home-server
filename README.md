@@ -10,6 +10,7 @@ I am using Ubuntu for no obvious reasons. Other Linux distributions should just 
   - The Ubuntu installation guide is pretty straightforward by itself, just make sure you have SSH installed.
   - **DO NOT INSTALL DOCKER!**: Ubuntu installed Docker will give you headaches when you try to use docker compose later. I am sure you can get it working, but it's not worth it. It is recommended to install Docker following Docker's official guide.
   - **DO NOT INSTALL PYTHON!**: Similar to Docker, Ubuntu installed Python has issues when getting pip to work. Don't waste your time.
+  - Run `sudo timedatectl set-timezone America/New_York`
 
 ## 2. Samba
 I use Samba to share my drives across the local network
