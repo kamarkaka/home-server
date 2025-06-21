@@ -181,3 +181,11 @@ A simple server for sending and receiving messages.
 An alternative server implementation of the Bitwarden Client API, written in Rust and compatible with official Bitwarden clients, perfect for self-hosted deployment where running the official resource-heavy service might not be ideal.
 
 ### 5.15 [Stash](./stash/README.md)
+
+## Port Forwarding
+- SSH: 22
+- HTTPS: 443
+- HTTP: 80
+- Samba: 445
+- qbittorrent: 6881
+- RDP: 3389
